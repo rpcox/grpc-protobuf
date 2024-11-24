@@ -17,12 +17,12 @@ var (
 )
 
 type server struct {
-	job.UnimplementedJobOrderServer
+	job.UnimplementedOrderServer
 }
 
-func (s *server) Create(_ context.Context, in *job.JobOrderRequest) (*job.JobOrderResponse, error) {
+func (s *server) Send(_ context.Context, in *job.JobRequest) (*job.JobResponse, error) {
 	log.Printf("Received: %v", in.GetId())
-	r := job.JobOrderResponse{}
+	r := job.JobResponse{}
 	r.Id = in.GetId()
 	r.JobType = in.GetJobType()
 	r.Device = in.GetDevice()
@@ -44,7 +44,7 @@ func main() {
         defer lis.Close()
 
 	s := grpc.NewServer()
-        job.RegisterJobOrderServer(s, &server{})
+        job.RegisterOrderServer(s, &server{})
         log.Printf("server listening at %v", lis.Addr())
         if err := s.Serve(lis); err != nil {
                 log.Fatalf("failed to serve: %v", err)

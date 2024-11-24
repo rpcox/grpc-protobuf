@@ -26,17 +26,18 @@ func main() {
 
         defer conn.Close()
 
-	joc := job.NewJobOrderClient(conn)
+	jrc := job.NewOrderClient(conn)
 	// Contact the server and print out its response.
         ctx, cancel := context.WithTimeout(context.Background(), time.Second)
         defer cancel()
 
-	order := job.JobOrderRequest{Id: 100, JobType: "state", Device: "mydevice", Issued: 1000}
-        resp, err := joc.Create(ctx, &order)
+	order := job.JobRequest{Id: 100, JobType: "state", Device: "mydevice", Issued: 1000}
+        resp, err := jrc.Send(ctx, &order)
 	if err != nil {
                 log.Fatalf("could not kick job: %v", err)
         }
 
 	log.Printf("device: %s\nissued: %d\nstart: %d\nend: %d\nduration: %d\n",
 		resp.GetDevice(), resp.GetIssued(), resp.GetStart(), resp.GetEnd(), resp.GetEnd() - resp.GetStart())
+	log.Println("as string:", resp.String())
 }
