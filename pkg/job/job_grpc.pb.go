@@ -19,101 +19,101 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	JobOrder_Create_FullMethodName = "/job.JobOrder/Create"
+	Order_Send_FullMethodName = "/job.Order/Send"
 )
 
-// JobOrderClient is the client API for JobOrder service.
+// OrderClient is the client API for Order service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type JobOrderClient interface {
-	Create(ctx context.Context, in *JobOrderRequest, opts ...grpc.CallOption) (*JobOrderResponse, error)
+type OrderClient interface {
+	Send(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 }
 
-type jobOrderClient struct {
+type orderClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewJobOrderClient(cc grpc.ClientConnInterface) JobOrderClient {
-	return &jobOrderClient{cc}
+func NewOrderClient(cc grpc.ClientConnInterface) OrderClient {
+	return &orderClient{cc}
 }
 
-func (c *jobOrderClient) Create(ctx context.Context, in *JobOrderRequest, opts ...grpc.CallOption) (*JobOrderResponse, error) {
+func (c *orderClient) Send(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*JobResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(JobOrderResponse)
-	err := c.cc.Invoke(ctx, JobOrder_Create_FullMethodName, in, out, cOpts...)
+	out := new(JobResponse)
+	err := c.cc.Invoke(ctx, Order_Send_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// JobOrderServer is the server API for JobOrder service.
-// All implementations must embed UnimplementedJobOrderServer
+// OrderServer is the server API for Order service.
+// All implementations must embed UnimplementedOrderServer
 // for forward compatibility.
-type JobOrderServer interface {
-	Create(context.Context, *JobOrderRequest) (*JobOrderResponse, error)
-	mustEmbedUnimplementedJobOrderServer()
+type OrderServer interface {
+	Send(context.Context, *JobRequest) (*JobResponse, error)
+	mustEmbedUnimplementedOrderServer()
 }
 
-// UnimplementedJobOrderServer must be embedded to have
+// UnimplementedOrderServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedJobOrderServer struct{}
+type UnimplementedOrderServer struct{}
 
-func (UnimplementedJobOrderServer) Create(context.Context, *JobOrderRequest) (*JobOrderResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedOrderServer) Send(context.Context, *JobRequest) (*JobResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Send not implemented")
 }
-func (UnimplementedJobOrderServer) mustEmbedUnimplementedJobOrderServer() {}
-func (UnimplementedJobOrderServer) testEmbeddedByValue()                  {}
+func (UnimplementedOrderServer) mustEmbedUnimplementedOrderServer() {}
+func (UnimplementedOrderServer) testEmbeddedByValue()               {}
 
-// UnsafeJobOrderServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to JobOrderServer will
+// UnsafeOrderServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to OrderServer will
 // result in compilation errors.
-type UnsafeJobOrderServer interface {
-	mustEmbedUnimplementedJobOrderServer()
+type UnsafeOrderServer interface {
+	mustEmbedUnimplementedOrderServer()
 }
 
-func RegisterJobOrderServer(s grpc.ServiceRegistrar, srv JobOrderServer) {
-	// If the following call pancis, it indicates UnimplementedJobOrderServer was
+func RegisterOrderServer(s grpc.ServiceRegistrar, srv OrderServer) {
+	// If the following call pancis, it indicates UnimplementedOrderServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&JobOrder_ServiceDesc, srv)
+	s.RegisterService(&Order_ServiceDesc, srv)
 }
 
-func _JobOrder_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JobOrderRequest)
+func _Order_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(JobOrderServer).Create(ctx, in)
+		return srv.(OrderServer).Send(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: JobOrder_Create_FullMethodName,
+		FullMethod: Order_Send_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(JobOrderServer).Create(ctx, req.(*JobOrderRequest))
+		return srv.(OrderServer).Send(ctx, req.(*JobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// JobOrder_ServiceDesc is the grpc.ServiceDesc for JobOrder service.
+// Order_ServiceDesc is the grpc.ServiceDesc for Order service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var JobOrder_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "job.JobOrder",
-	HandlerType: (*JobOrderServer)(nil),
+var Order_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "job.Order",
+	HandlerType: (*OrderServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _JobOrder_Create_Handler,
+			MethodName: "Send",
+			Handler:    _Order_Send_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

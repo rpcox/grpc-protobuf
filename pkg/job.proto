@@ -2,14 +2,14 @@ syntax = "proto3";
 package job;
 option go_package="github.com/rpcox/grpc-protobuf/pkg/job";
 
-message JobOrderRequest {
+message JobRequest {
 	int64	id = 1;
 	string	job_type = 2;
 	string	device = 3;
 	int64	issued = 4;
 }
 
-message JobOrderResponse {
+message JobResponse {
 	int64	id = 1;
 	string	job_type = 2;
 	string	device = 3;
@@ -18,7 +18,7 @@ message JobOrderResponse {
 	int64	end = 6;
 }
 
-service JobOrder {
-	rpc Create(JobOrderRequest) returns (JobOrderResponse) {}
+service Order {
+	rpc Send(JobRequest) returns (JobResponse) {}
 }
 
