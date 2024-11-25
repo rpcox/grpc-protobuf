@@ -5,7 +5,7 @@ go 1.22.7
 toolchain go1.22.9
 
 require (
-	github.com/rpcox/grpc-protobuf/pkg/job v0.3.1
+	github.com/rpcox/grpc-protobuf/pkg/job v0.4.0
 	google.golang.org/grpc v1.68.0
 )
 

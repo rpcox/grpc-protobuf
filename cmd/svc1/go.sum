@@ -6,6 +6,8 @@ github.com/rpcox/grpc-protobuf/pkg/job v0.2.0 h1:m4On66bHDkyiImQHOrmw6LcMyUBVQy7
 github.com/rpcox/grpc-protobuf/pkg/job v0.2.0/go.mod h1:6ZA1v9W3gdicVOnPdizH71Fz4htdJiIjRprMDKX2IVg=
 github.com/rpcox/grpc-protobuf/pkg/job v0.3.1 h1:P+I1MjoAVFtUAsln2MrHJtfxddOTPZANy3FGxmvj1hk=
 github.com/rpcox/grpc-protobuf/pkg/job v0.3.1/go.mod h1:6ZA1v9W3gdicVOnPdizH71Fz4htdJiIjRprMDKX2IVg=
+github.com/rpcox/grpc-protobuf/pkg/job v0.4.0 h1:xYNVG4tJGCtZPiJgHWcpOIVvJgjf9mxOpvj9da6QjtY=
+github.com/rpcox/grpc-protobuf/pkg/job v0.4.0/go.mod h1:6ZA1v9W3gdicVOnPdizH71Fz4htdJiIjRprMDKX2IVg=
 golang.org/x/net v0.29.0 h1:5ORfpBpCs4HzDYoodCDBbwHzdR5UrLBZ3sOnUJmFoHo=
 golang.org/x/net v0.29.0/go.mod h1:gLkgy8jTGERgjzMic6DS9+SP0ajcu6Xu3Orq/SpETg0=
 golang.org/x/net v0.31.0 h1:68CPQngjLL0r2AlUKiSxtQFKvzRVbnzLwMUn5SzcLHo=
