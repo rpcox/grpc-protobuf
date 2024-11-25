@@ -1,11 +1,3 @@
-github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek=
-github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
-github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
-github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-github.com/rpcox/grpc-protobuf/pkg/job v0.2.0 h1:m4On66bHDkyiImQHOrmw6LcMyUBVQy7Bjd0qPCL36C4=
-github.com/rpcox/grpc-protobuf/pkg/job v0.2.0/go.mod h1:6ZA1v9W3gdicVOnPdizH71Fz4htdJiIjRprMDKX2IVg=
-github.com/rpcox/grpc-protobuf/pkg/job v0.3.0 h1:tbOda2lFW1C1rIJIiein+HT6pZJy7GU0+PJk9W6Tq9U=
-github.com/rpcox/grpc-protobuf/pkg/job v0.3.0/go.mod h1:6ZA1v9W3gdicVOnPdizH71Fz4htdJiIjRprMDKX2IVg=
 github.com/rpcox/grpc-protobuf/pkg/job v0.3.1 h1:P+I1MjoAVFtUAsln2MrHJtfxddOTPZANy3FGxmvj1hk=
 github.com/rpcox/grpc-protobuf/pkg/job v0.3.1/go.mod h1:6ZA1v9W3gdicVOnPdizH71Fz4htdJiIjRprMDKX2IVg=
 golang.org/x/net v0.31.0 h1:68CPQngjLL0r2AlUKiSxtQFKvzRVbnzLwMUn5SzcLHo=
