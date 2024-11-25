@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/peer"
 	"github.com/rpcox/grpc-protobuf/pkg/job"
 )
 
@@ -20,16 +21,19 @@ type server struct {
 	job.UnimplementedOrderServer
 }
 
-func (s *server) Send(_ context.Context, in *job.JobRequest) (*job.JobResponse, error) {
-	log.Printf("Received: %v", in.GetId())
-	r := job.JobResponse{}
-	r.Id = in.GetId()
-	r.JobType = in.GetJobType()
-	r.Device = in.GetDevice()
-	r.Issued = in.GetIssued()
-	t0 := time.Now().Unix()
-	r.Start  = t0
-        r.End = t0 + 1000
+func (s *server) Send(ctx context.Context, in *job.JobRequest) (*job.JobResponse, error) {
+	log.Printf("job received: %v", in.GetId())
+	if p, ok := peer.FromContext(ctx); ok {
+		//log.Println(p.Addr)
+		log.Println(p.String())
+	}
+	r := job.JobResponse{Id: in.GetId(), JobType: in.GetJobType(), Device: in.GetDevice(), Issued: in.GetIssued()}
+	r.Start = job.TimeStamp()
+
+	// do something
+	time.Sleep(5 * time.Second)
+	r.End = job.TimeStamp()
+	log.Printf("job completed: %v", in.GetId())
 
 	return &r, nil
 }
