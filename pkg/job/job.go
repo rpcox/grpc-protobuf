@@ -9,5 +9,5 @@ func TimeStamp() int64 {
 }
 
 func Order() int64 {
-	return time.Now().UnixNano()
+	return time.Now().UnixMicro()
 }
