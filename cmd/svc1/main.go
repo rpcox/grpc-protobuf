@@ -8,13 +8,13 @@ import (
 	"net"
 	"time"
 
+	"github.com/rpcox/grpc-protobuf/pkg/job"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/peer"
-	"github.com/rpcox/grpc-protobuf/pkg/job"
 )
 
 var (
-        port = flag.Int("port", 10101, "the port to listen to")
+	port = flag.Int("port", 10101, "the port to listen to")
 )
 
 type server struct {
@@ -22,9 +22,8 @@ type server struct {
 }
 
 func (s *server) Send(ctx context.Context, in *job.JobRequest) (*job.JobResponse, error) {
-	log.Printf("job received: %v", in.GetId())
+	log.Printf("job %v received\n", in.GetId())
 	if p, ok := peer.FromContext(ctx); ok {
-		//log.Println(p.Addr)
 		log.Println(p.String())
 	}
 	r := job.JobResponse{Id: in.GetId(), JobType: in.GetJobType(), Device: in.GetDevice(), Issued: in.GetIssued()}
@@ -33,25 +32,25 @@ func (s *server) Send(ctx context.Context, in *job.JobRequest) (*job.JobResponse
 	// do something
 	time.Sleep(5 * time.Second)
 	r.End = job.TimeStamp()
-	log.Printf("job completed: %v", in.GetId())
+	log.Printf("job %v completed\n", in.GetId())
 
 	return &r, nil
 }
 
 func main() {
-        flag.Parse()
-        lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
-        if err != nil {
-                log.Fatalf("failed to listen: %v", err)
-        }
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 
-        defer lis.Close()
+	defer lis.Close()
 
 	s := grpc.NewServer()
-        job.RegisterOrderServer(s, &server{})
-        log.Printf("server listening at %v", lis.Addr())
-        if err := s.Serve(lis); err != nil {
-                log.Fatalf("failed to serve: %v", err)
-        }
+	job.RegisterOrderServer(s, &server{})
+	log.Printf("server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 
 }
