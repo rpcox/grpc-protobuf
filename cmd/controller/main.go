@@ -4,12 +4,25 @@ import (
 	"context"
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/rpcox/grpc-protobuf/pkg/job"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+const stateBaseInterval = time.Second
+const reportBaseInterval = time.Minute
+const baseTimeout = time.Second
+
+type JobStream struct {
+	RequestStream  chan *job.JobRequest
+	ResponseStream chan *job.JobResponse
+}
 
 var (
 	branch   string
@@ -28,47 +41,102 @@ var (
 
 }*/
 
-func NewJob(jobType string) (*job.JobResponse, error) {
-	conn, err := grpc.NewClient(*_addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+func SigHandler(sig chan os.Signal, done chan interface{}) {
+	for {
+		signal := <-sig
+		if signal == syscall.SIGINT || signal == syscall.SIGTERM {
+			close(done)
+			break
+		}
+
+	}
+
+	log.Println("exit sig handler")
+}
+
+func Initialize() (*[]Job, *[]Job) {
+	flag.Parse()
+	Version(*_version)
+	StartLogging(*_log, nil)
+	state, report, err := LoadJobs(*_jobList)
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		log.Fatal("LoadJobs():", err)
+	}
+
+	return state, report
+}
+
+func RunJob(order job.JobRequest) {
+	var addr string
+	switch order.JobType {
+	case "state":
+		addr = *_addr
+	case "report":
+		log.Println("NewJob(report) not implmented")
+		return
+	}
+
+	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Printf("error: id=%d, device=%s: %v\n", order.Id, order.Device, err)
+		return
 	}
 	defer conn.Close()
 
 	jrc := job.NewOrderClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*_timeOut)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*_timeOut)*baseTimeout)
 	defer cancel()
 
-	order := job.JobRequest{Id: job.Order(), JobType: jobType, Device: "mydevice", Issued: time.Now().Unix()}
 	resp, err := jrc.Send(ctx, &order)
-
-	return resp, err
+	if err != nil {
+		log.Printf("error: id=%d, device=%s: %v\n", order.Id, order.Device, err)
+	} else {
+		log.Printf("success: %s\n", resp.String())
+	}
 }
 
-func Initialize() {
-	flag.Parse()
-	Version(*_version)
-	StartLogging(*_log, nil)
-	jobs, err := LoadJobs(*_jobList)
-	if err != nil {
-		log.Fatal("LoadJobs():", err)
+func JobTicker(interval int, jobs *[]Job, done chan interface{}, wg *sync.WaitGroup) {
+	ticker := time.NewTicker(time.Duration(interval) * time.Second)
+	defer ticker.Stop()
+	log.Printf("starting JobTicker(): interval: %d, jobs: %d\n", interval, len(*jobs))
+
+	for {
+		select {
+		case <-ticker.C:
+			for _, j := range *jobs {
+				order := job.JobRequest{Id: job.Order(), JobType: j.Type, Device: j.Device, Issued: time.Now().Unix()}
+				go RunJob(order)
+
+			}
+		case _, ok := <-done:
+			if !ok {
+				log.Printf("exiting JobTicker(): interval: %d, jobs: %d\n", interval, len(*jobs))
+				wg.Done()
+				return
+			}
+		}
 	}
-	log.Printf("loading %d jobs\n", len(*jobs))
-	tm := TickerMap(jobs)
-	log.Printf("loading %d tickers\n", len(tm))
-	log.Println("intervals - ", tm)
+
 }
 
 func main() {
-	Initialize()
-	resp, err := NewJob("state")
-	if err != nil {
-		// don't do fatal
-		log.Fatalf("%v: %v", resp.String(), err)
-	}
+	var wg sync.WaitGroup
+	done := make(chan interface{})
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	go SigHandler(sig, done)
 
-	//log.Printf("device: %s\nissued: %d\nstart: %d\nend: %d\nduration: %d\n",
-	//	resp.GetDevice(), resp.GetIssued(), resp.GetStart(), resp.GetEnd(), resp.GetEnd() - resp.GetStart())
-	log.Println("completed:", resp.String())
+	stateJobs, _ := Initialize()
+
+	stm := StateTickerMap(stateJobs)
+	for interval, _ := range stm {
+		jobs := JobsByInterval(interval, stateJobs)
+		wg.Add(1)
+		go JobTicker(interval, jobs, done, &wg)
+	}
+	stateJobs = nil // done w/ these structures
+	stm = nil
+
+	wg.Wait()
+	log.Println("clean exit")
 }

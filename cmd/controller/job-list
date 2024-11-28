@@ -1,0 +1,7 @@
+DEVICE	JOB_TYPE	INTERVAL
+device1	state	60
+device2	state	60
+device3	state	120
+device4	state	30
+device5	state	60
+device5	report	24
