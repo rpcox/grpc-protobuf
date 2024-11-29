@@ -17,11 +17,11 @@ import (
 var (
 	branch  string
 	commit  string
-	tool    string = `svc1`
+	tool    string = `svc2`
 	version string = `0.1.0`
 	Debug          = flag.Bool("debug", false, "Enable debug logging")
 	_log           = flag.String("log", "local.log", tool+" log file")
-	_port          = flag.Int("port", 10101, "Identify the port to listen at")
+	_port          = flag.Int("port", 10102, "Identify the port to listen at")
 	//_sdisc = flag.String("sdisc", ":80", "Identify the service discovery agent")
 	_version = flag.Bool("version", false, "Display version and exit")
 )
@@ -69,7 +69,7 @@ type server struct {
 }
 
 func (s *server) Send(ctx context.Context, in *job.JobRequest) (*job.JobResponse, error) {
-	log.Printf("state job %v received\n", in.GetId())
+	log.Printf("report job %v received\n", in.GetId())
 	if p, ok := peer.FromContext(ctx); ok {
 		log.Println(p.String())
 	}
@@ -79,7 +79,7 @@ func (s *server) Send(ctx context.Context, in *job.JobRequest) (*job.JobResponse
 	// do something
 	time.Sleep(5 * time.Second)
 	r.End = job.TimeStamp()
-	log.Printf("state job %v completed\n", in.GetId())
+	log.Printf("report job %v completed\n", in.GetId())
 
 	return &r, nil
 }

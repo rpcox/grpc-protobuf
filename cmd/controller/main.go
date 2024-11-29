@@ -15,8 +15,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const stateBaseInterval = time.Second
-const reportBaseInterval = time.Minute
 const baseTimeout = time.Second
 
 type JobStream struct {
@@ -25,16 +23,17 @@ type JobStream struct {
 }
 
 var (
-	branch   string
-	commit   string
-	tool     string = `controller`
-	version  string = `0.1.0`
-	_addr           = flag.String("addr", "localhost:10101", "the address to connect to")
-	_jobList        = flag.String("job-list", "job-list", "Identify the job list")
-	_log            = flag.String("log", "local.log", tool+" log file")
-	_timeOut        = flag.Int("timeout", 5, "context time-out")
-	_version        = flag.Bool("version", false, "Display version and exit")
-	Debug           = flag.Bool("debug", false, "Enable debug logging")
+	branch      string
+	commit      string
+	tool        string = `controller`
+	version     string = `0.1.0`
+	_jobList           = flag.String("job-list", "job-list", "Identify the job list")
+	_log               = flag.String("log", "local.log", tool+" log file")
+	_svc_report        = flag.String("svc-report", "localhost:10102", "the address to connect to")
+	_svc_state         = flag.String("svc-state", "localhost:10101", "the address to connect to")
+	_timeOut           = flag.Int("timeout", 5, "context time-out")
+	_version           = flag.Bool("version", false, "Display version and exit")
+	Debug              = flag.Bool("debug", false, "Enable debug logging")
 )
 
 /*func FindServiceAddr(service []string) {
@@ -70,10 +69,9 @@ func RunJob(order job.JobRequest) {
 	var addr string
 	switch order.JobType {
 	case "state":
-		addr = *_addr
+		addr = *_svc_state
 	case "report":
-		log.Println("NewJob(report) not implmented")
-		return
+		addr = *_svc_report
 	}
 
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -105,6 +103,7 @@ func JobTicker(interval int, jobs *[]Job, done chan interface{}, wg *sync.WaitGr
 		case <-ticker.C:
 			for _, j := range *jobs {
 				order := job.JobRequest{Id: job.Order(), JobType: j.Type, Device: j.Device, Issued: time.Now().Unix()}
+				log.Println("submitting", order)
 				go RunJob(order)
 
 			}
@@ -126,7 +125,7 @@ func main() {
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	go SigHandler(sig, done)
 
-	stateJobs, _ := Initialize()
+	stateJobs, reportJobs := Initialize()
 
 	stm := StateTickerMap(stateJobs)
 	for interval, _ := range stm {
@@ -136,6 +135,9 @@ func main() {
 	}
 	stateJobs = nil // done w/ these structures
 	stm = nil
+
+	wg.Add(1)
+	go JobTicker(5, reportJobs, done, &wg)
 
 	wg.Wait()
 	log.Println("clean exit")
