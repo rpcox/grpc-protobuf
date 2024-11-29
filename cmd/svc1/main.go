@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	port = flag.Int("port", 10101, "the port to listen to")
+	_port = flag.Int("port", 10101, "Identify the port to listen at")
+	//_sdisc = flag.String("sdisc", ":80", "Identify the service discovery agent")
 )
 
 type server struct {
@@ -39,7 +40,7 @@ func (s *server) Send(ctx context.Context, in *job.JobRequest) (*job.JobResponse
 
 func main() {
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *_port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
