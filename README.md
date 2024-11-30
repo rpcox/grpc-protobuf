@@ -14,7 +14,7 @@ The job list is a tab delimited file with the following fields
     JOB_TYPE = The type of job to execute (requires modification of the controller main.go RunJob() switch clause)
     INTERVAL = An integer that is multiplied by the time interval of the time.ticker
 
-    EXAMPLE 
+    EXAMPLE
 
     DEVICE	JOB_TYPE	INTERVAL
     device1	state	60
@@ -32,4 +32,4 @@ The controller and svc[12] use this package.
 
 ### svc[12]
 
-Simple servers that receive a gRPC call and 'do something'.  Currently they just mimic and action through time.Sleep().
+Simple servers that receive a gRPC call and 'do something'.  Currently they just mimic an action through a time.Sleep() call.
